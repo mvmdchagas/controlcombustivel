@@ -664,7 +664,6 @@ function App() {
                 if (window.scrollY > 200) { // Mostra o botão após rolar 200px para baixo
                     scrollToTopRef.current.classList.remove('hidden');
                 } else {
-                    // CORREÇÃO: Alterado de 'scrollToToRef' para 'scrollToTopRef'
                     scrollToTopRef.current.classList.add('hidden');
                 }
             }
@@ -708,16 +707,24 @@ function App() {
                         Bem-vindo! <span role="img" aria-label="mão acenando">👋</span>
                     </h2>
                     {userId && auth?.currentUser?.email && (
-                        <p className="text-lg text-gray-700 mt-2">
+                        <p className="text-lg text-gray-700 mt-2 flex items-center justify-center flex-wrap gap-2">
                             Você está logado com o e-mail: <span className="font-mono bg-gray-100 px-2 py-1 rounded break-all">{auth.currentUser.email}</span>
+                            {/* Botão Sair - agora um link discreto */}
+                            <button
+                                onClick={handleLogout}
+                                className="text-red-500 hover:underline focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-75 transition duration-200 text-base ml-2"
+                                title="Sair da conta"
+                            >
+                                Sair
+                            </button>
                         </p>
                     )}
                 </div>
 
-                {/* Seção de Autenticação (Formulário de Login/Cadastro ou Botão de Logout) */}
-                <div className="mb-10 p-6 bg-gray-100 rounded-xl shadow-inner text-center">
-                    <h2 className="text-2xl font-bold text-gray-700 mb-4">Autenticação</h2>
-                    {showAuthForm ? ( // Usa showAuthForm para controlar a visibilidade
+                {/* Seção de Autenticação (Formulário de Login/Cadastro) */}
+                {showAuthForm && ( // Renderiza esta seção APENAS se o formulário de autenticação deve ser mostrado
+                    <div className="mb-10 p-6 bg-gray-100 rounded-xl shadow-inner text-center">
+                        <h2 className="text-2xl font-bold text-gray-700 mb-4">Autenticação</h2>
                         <div>
                             <form onSubmit={authMode === 'login' ? handleLogin : handleSignUp} className="space-y-4">
                                 <input
@@ -754,21 +761,8 @@ function App() {
                             </button>
                             {authError && <p className="text-red-600 text-sm mt-4">{authError}</p>}
                         </div>
-                    ) : ( // Se showAuthForm for false (usuário logado)
-                        userId && ( // Apenas mostra se userId realmente existe
-                            <div>
-                                {/* Removida a mensagem duplicada e o display do UID */}
-                                <button
-                                    onClick={handleLogout}
-                                    className="px-6 py-3 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-75 transition duration-200"
-                                >
-                                    Sair
-                                </button>
-                                {authError && <p className="text-red-600 text-sm mt-4">{authError}</p>}
-                            </div>
-                        )
-                    )}
-                </div>
+                    </div>
+                )}
 
                 {/* Renderiza o restante do conteúdo APENAS se o usuário estiver logado */}
                 {userId && (
@@ -914,7 +908,7 @@ function App() {
                         {/* Seção do Formulário de Abastecimento */}
                         <div className="mb-10 p-6 bg-blue-50 rounded-xl shadow-inner">
                             <h2 className="text-2xl font-bold text-gray-700 mb-6 text-center">
-                                {activeVehicle ? `Registrar Abastecimento para ${activeVehicle.name} ${activeVehicle.emoji}` : 'Selecione um Veículo para Registrar'} <span role="img" aria-label="bomba de combustível">⛽</span>
+                                Registrar Abastecimento <span role="img" aria-label="bomba de combustível">⛽</span>
                             </h2>
                             {activeVehicle ? (
                                 <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1007,7 +1001,7 @@ function App() {
 
                         {/* Seção de Resumo do Consumo Geral */}
                         <div className="mb-10 p-6 bg-green-50 rounded-xl shadow-inner text-center">
-                            <h2 className="text-2xl font-bold text-gray-700 mb-4">Consumo Médio Geral {activeVehicle ? `(${activeVehicle.name} ${activeVehicle.emoji})` : ''} <span role="img" aria-label="gráfico de barras">📊</span></h2>
+                            <h2 className="text-2xl font-bold text-gray-700 mb-4">Consumo Médio Geral <span role="img" aria-label="gráfico de barras">📊</span></h2>
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-gray-800">
                                 <div>
                                     <p className="text-lg font-semibold">Km/L:</p>
@@ -1026,7 +1020,7 @@ function App() {
 
                         {/* Seção da Tabela de Registros de Abastecimento */}
                         <div className="mb-10">
-                            <h2 className="text-2xl font-bold text-gray-700 mb-6 text-center">Registros de Abastecimento {activeVehicle ? `(${activeVehicle.name} ${activeVehicle.emoji})` : ''}</h2>
+                            <h2 className="text-2xl font-bold text-gray-700 mb-6 text-center">Registros de Abastecimento</h2>
                             {fuelEntries.length === 0 ? (
                                 <p className="text-center text-gray-500">Nenhum registro de abastecimento para este veículo ainda. Adicione um acima! <span role="img" aria-label="bloco de notas">📝</span></p>
                             ) : (
@@ -1098,7 +1092,7 @@ function App() {
                                         onClick={handleClearAllEntries}
                                         className="px-6 py-3 bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-75 transition duration-200"
                                     >
-                                        Apagar Todos os Registros {activeVehicle ? `(${activeVehicle.name} ${activeVehicle.emoji})` : ''} <span role="img" aria-label="lixeira">🗑️</span>
+                                        Apagar Todos os Registros <span role="img" aria-label="lixeira">🗑️</span>
                                     </button>
                                 </div>
                             )}
@@ -1107,7 +1101,7 @@ function App() {
                         {/* Seção do Gráfico de Consumo */}
                         {chartData.length > 0 && (
                             <div className="mb-10 p-6 bg-white rounded-xl shadow-lg">
-                                <h2 className="text-2xl font-bold text-gray-700 mb-6 text-center">Gráfico de Consumo (Km/L) {activeVehicle ? `(${activeVehicle.name} ${activeVehicle.emoji})` : ''}</h2>
+                                <h2 className="text-2xl font-bold text-gray-700 mb-6 text-center">Gráfico de Consumo (Km/L)</h2>
                                 <ResponsiveContainer width="100%" height={300}>
                                     <LineChart
                                         data={chartData}
